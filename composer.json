@@ -1,0 +1,12 @@
+{
+    "name": "seventhcode/form-generator",
+    "description": "Gerador de formularios",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Jhonny Fialho",
+            "email": "jhonny@hello-world.cc"
+        }
+    ],
+    "require": {}
+}
