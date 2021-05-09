@@ -2,7 +2,6 @@
 
 namespace SenventhCode\FormGenerator;
 
-use App\Services\Metadata\MetadataService;
 use SenventhCode\FormGenerator\MetadataService;
 
 class FormService

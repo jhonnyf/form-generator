@@ -8,5 +8,9 @@
             "email": "jhonny@hello-world.cc"
         }
     ],
-    "require": {}
+    "autoload": {
+        "psr-4": {
+            "FormGenerator\\": "src/"
+        }
+    }
 }
