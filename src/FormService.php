@@ -57,6 +57,7 @@ class FormService
 
         unset($fields['created_at']);
         unset($fields['updated_at']);
+        unset($fields['active']);
 
         return static::formatFields($fields);
     }
