@@ -65,8 +65,9 @@ class FormService
     {
         $fields = [];
 
-        $text   = ['varchar', 'char'];
-        $number = ['bigint', 'tinyint', 'int', 'decimal'];
+        $text     = ['varchar', 'char'];
+        $number   = ['bigint', 'tinyint', 'int', 'decimal'];
+        $dateTime = ['datetime', 'timestamp'];
 
         foreach ($columns as $column) {
 
@@ -85,7 +86,7 @@ class FormService
                 $type = 'number';
             } elseif ($column['type'] === 'date') {
                 $type = 'date';
-            } elseif (in_array($column['type'], ['datetime', 'timestamp'])) {
+            } elseif (in_array($column['type'], $dateTime)) {
                 $type  = 'datetime-local';
                 $value = str_replace(" ", "T", $value);
             } else {
