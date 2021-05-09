@@ -53,7 +53,12 @@ class FormService
 
     private static function formRules()
     {
-        return static::formatFields(self::$fields);
+        $fields = self::$fields;
+
+        unset($fields['created_at']);
+        unset($fields['updated_at']);
+
+        return static::formatFields($fields);
     }
 
     private static function formatFields(array $columns, array $formValues = []): array
@@ -80,7 +85,7 @@ class FormService
                 $type = 'number';
             } elseif ($column['type'] === 'date') {
                 $type = 'date';
-            } elseif ($column['type'] === 'datetime') {
+            } elseif (in_array($column['type'], ['datetime', 'timestamp'])) {
                 $type  = 'datetime-local';
                 $value = str_replace(" ", "T", $value);
             } else {
