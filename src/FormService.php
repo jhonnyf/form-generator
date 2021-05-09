@@ -12,31 +12,22 @@ class FormService
     public static function init($Model)
     {
         self::$table = (new $Model)->getTable();
+        self::getFields();
 
-        return self::getFields();
+        // $className = static::createNameClass($tableName);
+        // $pathClass = static::checkClass($className);
+        // $fields    = $pathClass::formRules($columns, $formValues);
+
+        return self::formRules();
     }
 
     private static function getFields()
     {
-        return self::formFields(self::$table);
+        $metadata     = MetadataService::tableMetadata(self::$table);
+        self::$fields = static::transformFields($metadata);
     }
 
-    public static function formFields(string $tableName, array $formValues = []): array
-    {
-        $metadata   = MetadataService::tableMetadata($tableName);
-
-        print_r($metadata);
-        exit();
-
-        $className = static::createNameClass($tableName);
-
-        $pathClass = static::checkClass($className);
-        $fields    = $pathClass::formRules($columns, $formValues);
-
-        return $fields;
-    }
-
-    private static function fields(array $fields): array
+    private static function transformFields(array $fields): array
     {
         foreach ($fields as $field) {
 
@@ -58,6 +49,11 @@ class FormService
         }
 
         return $metadata;
+    }
+
+    private static function formRules()
+    {
+        return static::formatFields(self::$fields);
     }
 
     private static function formatFields(array $columns, array $formValues = []): array
