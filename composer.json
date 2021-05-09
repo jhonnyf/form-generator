@@ -10,7 +10,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "FormGenerator\\": "src/"
+            "SenventhCode\\FormGenerator\\": "src/"
         }
     }
 }
