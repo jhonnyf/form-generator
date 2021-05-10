@@ -120,7 +120,9 @@ class FormService
 
         if (file_exists(app_path("Services/FormService/{$className}.php"))) {
             $path   = "\App\Services\FormService\\{$className}";
-            $fields = $path::customRules($fields);
+            if (method_exists(new $path, 'customRules')) {
+                $fields = $path::customRules($fields);
+            }            
         }
 
         return $fields;
