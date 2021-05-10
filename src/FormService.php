@@ -2,7 +2,7 @@
 
 namespace SenventhCode\FormGenerator;
 
-use SenventhCode\FormGenerator\MetadataService;
+use Illuminate\Support\Facades\DB;
 
 class FormService
 {
@@ -19,7 +19,7 @@ class FormService
 
     private static function getFields(): void
     {
-        $metadata     = MetadataService::tableMetadata(self::$table);
+        $metadata     = static::tableMetadata(self::$table);
         self::$fields = static::transformFields($metadata);
 
         return;
@@ -58,6 +58,7 @@ class FormService
         unset($fields['updated_at']);
 
         $fields = static::formatFields($fields);
+        $fields = static::customRules($fields);
 
         return $fields;
     }
@@ -105,4 +106,24 @@ class FormService
 
         return $fields;
     }
+
+    private static function tableMetadata(string $table): array
+    {
+        return DB::select("DESCRIBE {$table};");
+    }
+
+    private static function customRules(array $fields): array
+    {
+        $className = str_replace('_', ' ', self::$table);
+        $className = str_replace(' ', '', $className);
+        $className = ucwords($className);
+
+        if (file_exists(app_path("Services/FormService/{$className}.php"))) {
+            $path   = "\App\Services\FormService\\{$className}";
+            $fields = $path::customRules($fields);
+        }
+
+        return $fields;
+    }
+
 }
