@@ -14,17 +14,15 @@ class FormService
         self::$table = (new $Model)->getTable();
         self::getFields();
 
-        // $className = static::createNameClass($tableName);
-        // $pathClass = static::checkClass($className);
-        // $fields    = $pathClass::formRules($columns, $formValues);
-
         return self::formRules();
     }
 
-    private static function getFields()
+    private static function getFields(): void
     {
         $metadata     = MetadataService::tableMetadata(self::$table);
         self::$fields = static::transformFields($metadata);
+
+        return;
     }
 
     private static function transformFields(array $fields): array
@@ -51,15 +49,17 @@ class FormService
         return $metadata;
     }
 
-    private static function formRules()
+    private static function formRules(): array
     {
         $fields = self::$fields;
 
+        unset($fields['active']);
         unset($fields['created_at']);
         unset($fields['updated_at']);
-        unset($fields['active']);
 
-        return static::formatFields($fields);
+        $fields = static::formatFields($fields);
+
+        return $fields;
     }
 
     private static function formatFields(array $columns, array $formValues = []): array

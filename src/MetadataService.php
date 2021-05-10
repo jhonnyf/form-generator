@@ -17,6 +17,11 @@ class MetadataService
         return $fields;
     }
 
+    public static function tableMetadata(string $table): array
+    {
+        return DB::select("DESCRIBE {$table};");
+    }
+
     private static function checkClass(string $className): string
     {
         $path = "\App\Services\Metadata\Master";
@@ -25,27 +30,6 @@ class MetadataService
         }
 
         return $path;
-    }
-
-    public static function formRulesMain(array $columns, array $formValues = []): array
-    {
-        unset($columns['active']);
-        unset($columns['created_at']);
-        unset($columns['updated_at']);
-
-        $columns = static::formatFields($columns, $formValues);
-
-        return $columns;
-    }
-
-    public static function tableMetadata(string $table): array
-    {
-        return static::describe($table);
-    }
-
-    private static function describe(string $table): array
-    {
-        return DB::select("DESCRIBE {$table};");
     }
 
     private static function createNameClass(string $tableName): string
