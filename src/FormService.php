@@ -115,8 +115,8 @@ class FormService
     private static function customRules(array $fields): array
     {
         $className = str_replace('_', ' ', self::$table);
-        $className = str_replace(' ', '', $className);
         $className = ucwords($className);
+        $className = str_replace(' ', '', $className);        
 
         if (file_exists(app_path("Services/FormService/{$className}.php"))) {
             $path   = "\App\Services\FormService\\{$className}";
