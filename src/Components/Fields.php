@@ -1,11 +1,11 @@
 <?php
 
-namespace SenventhCode\FormGenerator;
+namespace SenventhCode\FormGenerator\Components;
 
 use Illuminate\Http\Request;
 use Illuminate\View\Component;
 
-class FormFields extends Component
+class Fields extends Component
 {
     public $formFields;
     public $id;
