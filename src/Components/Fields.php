@@ -24,6 +24,6 @@ class Fields extends Component
 
     public function render()
     {
-        return view('components.form-fields');
+        return view('form-service::components.fields');
     }
 }
