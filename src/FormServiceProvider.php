@@ -1,6 +1,6 @@
 <?php
 
-namespace DevinGray\CustomAuth\Providers;
+namespace SenventhCode\FormGenerator;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -8,11 +8,13 @@ class FormServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-
+        $this->loadViewComponentsAs('form-service', [
+            Fields::class
+        ]);
     }
 
-    public function register ()
+    public function register()
     {
-        # code...
+
     }
 }
