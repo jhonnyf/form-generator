@@ -8,10 +8,12 @@ class FormService
 {
     private static $table;
     private static $fields;
+    private static $values;
 
-    public static function init($Model)
+    public static function init($Model, array $values = [])
     {
-        self::$table = (new $Model)->getTable();
+        self::$table  = (new $Model)->getTable();
+        self::$values = $values;
         self::getFields();
 
         return self::formRules();
@@ -57,7 +59,8 @@ class FormService
         unset($fields['created_at']);
         unset($fields['updated_at']);
 
-        $fields = static::formatFields($fields);
+        $fields = static::formatFields($fields, self::$values);
+        $fields = static::baseRules($fields);
         $fields = static::customRules($fields);
 
         return $fields;
@@ -68,7 +71,7 @@ class FormService
         $fields = [];
 
         $text     = ['varchar', 'char'];
-        $number   = ['bigint', 'tinyint', 'int', 'decimal'];
+        $number   = ['bigint', 'tinyint', 'int', 'decimal', 'bigint unsigned'];
         $dateTime = ['datetime', 'timestamp'];
 
         foreach ($columns as $column) {
@@ -92,7 +95,7 @@ class FormService
                 $type  = 'datetime-local';
                 $value = str_replace(" ", "T", $value);
             } else {
-                exit("Tipo não definido - {$column['type']}");
+                exit("Tipo não definido - <b>{$column['type']}</b>");
             }
 
             $fields[$column['name']] = [
@@ -112,17 +115,31 @@ class FormService
         return DB::select("DESCRIBE {$table};");
     }
 
+    private static function baseRules(array $fields): array
+    {
+        $className = str_replace('_', ' ', self::$table);
+        $className = ucwords($className);
+        $className = str_replace(' ', '', $className);
+
+        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Users";
+        if (method_exists($path, 'baseRules')) {
+            $fields = $path::baseRules($fields);
+        }
+
+        return $fields;
+    }
+
     private static function customRules(array $fields): array
     {
         $className = str_replace('_', ' ', self::$table);
         $className = ucwords($className);
-        $className = str_replace(' ', '', $className);        
+        $className = str_replace(' ', '', $className);
 
         if (file_exists(app_path("Services/FormService/{$className}.php"))) {
-            $path   = "\App\Services\FormService\\{$className}";
+            $path = "\App\Services\FormService\\{$className}";
             if (method_exists(new $path, 'customRules')) {
                 $fields = $path::customRules($fields);
-            }            
+            }
         }
 
         return $fields;
