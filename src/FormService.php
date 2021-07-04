@@ -4,7 +4,7 @@ namespace SenventhCode\FormGenerator;
 
 use Illuminate\Support\Facades\DB;
 
-class FormService
+abstract class FormService
 {
     private static $table;
     private static $fields;
