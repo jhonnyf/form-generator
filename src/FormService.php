@@ -19,6 +19,11 @@ abstract class FormService
         return self::formRules();
     }
 
+    public static function customForm(array $fields)
+    {
+        # code...
+    }
+
     private static function getFields(): void
     {
         $metadata     = static::tableMetadata(self::$table);
