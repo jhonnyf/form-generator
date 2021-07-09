@@ -19,7 +19,7 @@ class Select extends Element
         return $this;
     }
 
-    public function setOptions(bool $options)
+    public function setOptions(array $options)
     {
         $this->options = $options;
 
@@ -28,6 +28,9 @@ class Select extends Element
 
     public function returnAttributes(): array
     {
-        return get_object_vars($this);
+        $className = explode("\\", get_class($this));
+        $className = mb_strtolower(array_pop($className));
+
+        return array_merge(get_object_vars($this), ['elementType' => $className]);
     }
 }

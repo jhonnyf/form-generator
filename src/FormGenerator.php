@@ -114,17 +114,17 @@ class FormGenerator
         return $response;
     }
 
-    public function render(): array
+    public function render()
     {
         $formElements = get_object_vars($this);
         unset($formElements['elements']);
 
-        $response = [
+        $data = [
             'form'     => $formElements,
             'elements' => $this->getElements(),
         ];
 
-        return $response;
+        return view('form-generator::form-generator', $data);
     }
 
 }
