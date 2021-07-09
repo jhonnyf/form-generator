@@ -2,6 +2,7 @@
 
 namespace SenventhCode\FormGenerator;
 
+use Illuminate\Support\Facades\DB;
 use SenventhCode\FormGenerator\Elements\Button;
 use SenventhCode\FormGenerator\Elements\Input;
 use SenventhCode\FormGenerator\Elements\Select;
@@ -14,20 +15,21 @@ class FormGenerator
     private $enctype;
     private $method = 'POST';
     private $class;
-    private $elements;
+    private $elements = [];
 
     public function __construct(string $action)
     {
         $this->action = $action;
     }
 
-    public static function modelForm($Model, $values)
+    public function modelForm($Model, array $values)
     {
-        # code...
-    }
+        $tabel = (new $Model)->getTable();
 
-    public static function customForm()
-    {
+        $fields = $this->tableMetadata($tabel);
+        $fields = $this->transformFields($fields);
+        $fields = $this->baseRules($tabel, $fields);
+        $fields = $this->formatFields($fields, $values);
 
     }
 
@@ -106,6 +108,10 @@ class FormGenerator
 
     public function getElements(): array
     {
+        if (count($this->elements) == 0) {
+            return [];
+        }
+
         $response = [];
         foreach ($this->elements as $element) {
             $response[] = $element->returnAttributes();
@@ -113,6 +119,10 @@ class FormGenerator
 
         return $response;
     }
+
+    /**
+     * METHODS
+     */
 
     public function render()
     {
@@ -127,4 +137,101 @@ class FormGenerator
         return view('form-generator::form-generator', $data);
     }
 
+    private function tableMetadata(string $table): array
+    {
+        return DB::select("DESCRIBE {$table};");
+    }
+
+    private function transformFields(array $fields): array
+    {
+        foreach ($fields as $field) {
+
+            $max_length   = null;
+            $position_int = strpos($field->Type, "(");
+            if ($position_int !== false) {
+
+                preg_match('/[^a-z]+/', $field->Type, $matches);
+
+                $max_length = str_replace('(', '', $matches[0]);
+                $max_length = str_replace(')', '', $max_length);
+            }
+
+            $metadata[$field->Field]['name']       = $field->Field;
+            $metadata[$field->Field]['type']       = $position_int === false ? $field->Type : substr($field->Type, 0, $position_int);
+            $metadata[$field->Field]['max_length'] = trim($max_length);
+            $metadata[$field->Field]['key']        = strtolower($field->Key);
+            $metadata[$field->Field]['default']    = $field->Default;
+        }
+
+        unset($metadata['active']);
+        unset($metadata['created_at']);
+        unset($metadata['updated_at']);
+
+        return $metadata;
+    }
+
+    private function formatFields(array $columns, array $formValues = []): array
+    {
+        $text     = ['varchar', 'char'];
+        $number   = ['bigint', 'tinyint', 'int', 'decimal', 'bigint unsigned'];
+        $dateTime = ['datetime', 'timestamp'];
+
+        $fields = [];
+        foreach ($columns as $column) {
+
+            $value = isset($formValues[$column['name']]) ? $formValues[$column['name']] : '';
+            if (strlen($column['default']) > 0 && empty($value)) {
+                $value = $column['default'];
+            }
+
+            if ($column['key'] === 'pri') {
+                $type = 'hidden';
+            } elseif (in_array($column['type'], $text)) {
+                $type = 'text';
+            } elseif (in_array($column['type'], $number)) {
+                $type = 'number';
+            } elseif ($column['type'] === 'date') {
+                $type = 'date';
+            } elseif (in_array($column['type'], $dateTime)) {
+                $type  = 'datetime-local';
+                $value = str_replace(" ", "T", $value);
+            } else {
+                exit("Tipo não definido - <b>{$column['type']}</b>");
+            }
+
+            $input = $this->input($column['name'])
+                ->setType($type)
+                ->setValue($value);
+
+            if ($column['max_length'] > 0) {
+                $input->setMaxLength($column['max_length']);
+            }
+
+            if (isset($column['required'])) {
+                $input->setRequired($column['required']);
+            }
+
+            if (isset($column['label'])) {
+                $input->setLabel($column['label']);
+            }
+        }
+
+        $this->button('Salvar');
+
+        return $fields;
+    }
+
+    private function baseRules(string $table, array $fields): array
+    {
+        $className = str_replace('_', ' ', $table);
+        $className = ucwords($className);
+        $className = str_replace(' ', '', $className);
+
+        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Users";
+        if (method_exists($path, 'baseRules')) {            
+            $fields = $path::baseRules($fields);
+        }
+
+        return $fields;
+    }
 }

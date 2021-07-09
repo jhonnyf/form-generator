@@ -11,10 +11,14 @@
 
     @foreach ($elements as $element)
         @if ($element['elementType'] == 'input')
-            <div class="mb-3">
-                <label for="{{ $element['name'] }}">{{ $element['label'] }}</label>
-                <input type="{{ $element['type'] }}" name="{{ $element['name'] }}" id="{{ $element['name'] }}" class="form-control" {{ $element['required'] ? 'required' : '' }} value="{{ $element['value'] }}">
-            </div>
+            @if ($element['type'] == 'hidden')
+                <input type="{{ $element['type'] }}" name="{{ $element['name'] }}" value="{{ $element['value'] }}">
+            @else
+                <div class="mb-3">
+                    <label for="{{ $element['name'] }}">{{ $element['label'] }}</label>
+                    <input type="{{ $element['type'] }}" name="{{ $element['name'] }}" id="{{ $element['name'] }}" class="form-control" {{ $element['required'] ? 'required' : '' }} value="{{ $element['value'] }}" maxlength="{{ $element['maxlength'] }}">
+                </div>
+            @endif                    
         @endif
 
         @if ($element['elementType'] == 'select')
