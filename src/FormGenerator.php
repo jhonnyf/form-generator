@@ -184,35 +184,39 @@ class FormGenerator
                 $value = $column['default'];
             }
 
-            if ($column['key'] === 'pri') {
-                $type = 'hidden';
-            } elseif (in_array($column['type'], $text)) {
-                $type = 'text';
-            } elseif (in_array($column['type'], $number)) {
-                $type = 'number';
-            } elseif ($column['type'] === 'date') {
-                $type = 'date';
-            } elseif (in_array($column['type'], $dateTime)) {
-                $type  = 'datetime-local';
-                $value = str_replace(" ", "T", $value);
-            } else {
-                exit("Tipo não definido - <b>{$column['type']}</b>");
+            $elementType = isset($column['elementType']) ? $column['elementType'] : 'input';
+            if ($elementType == 'input') {
+
+                if ($column['key'] === 'pri') {
+                    $type = 'hidden';
+                } elseif (in_array($column['type'], $text)) {
+                    $type = 'text';
+                } elseif (in_array($column['type'], $number)) {
+                    $type = 'number';
+                } elseif ($column['type'] === 'date') {
+                    $type = 'date';
+                } elseif (in_array($column['type'], $dateTime)) {
+                    $type  = 'datetime-local';
+                    $value = str_replace(" ", "T", $value);
+                } else {
+                    $type = $column['type'];
+                }
             }
 
-            $input = $this->input($column['name'])
+            $elementType = $this->$elementType($column['name'])
                 ->setType($type)
                 ->setValue($value);
 
             if ($column['max_length'] > 0) {
-                $input->setMaxLength($column['max_length']);
+                $elementType->setMaxLength($column['max_length']);
             }
 
             if (isset($column['required'])) {
-                $input->setRequired($column['required']);
+                $elementType->setRequired($column['required']);
             }
 
             if (isset($column['label'])) {
-                $input->setLabel($column['label']);
+                $elementType->setLabel($column['label']);
             }
         }
 
@@ -228,7 +232,7 @@ class FormGenerator
         $className = str_replace(' ', '', $className);
 
         $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Users";
-        if (method_exists($path, 'baseRules')) {            
+        if (method_exists($path, 'baseRules')) {
             $fields = $path::baseRules($fields);
         }
 
