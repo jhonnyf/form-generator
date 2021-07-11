@@ -231,7 +231,7 @@ class FormGenerator
         $className = ucwords($className);
         $className = str_replace(' ', '', $className);
 
-        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Users";
+        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Modules\Users";
         if (method_exists($path, 'baseRules')) {
             $fields = $path::baseRules($fields);
         }
