@@ -28,7 +28,7 @@ class FormGenerator
 
         $fields = $this->tableMetadata($tabel);
         $fields = $this->transformFields($fields);
-        $fields = $this->baseRules($tabel, $fields);
+        $fields = $this->baseRules($tabel, $fields);        
         $fields = $this->formatFields($fields, $values);
 
     }
@@ -231,7 +231,7 @@ class FormGenerator
         $className = ucwords($className);
         $className = str_replace(' ', '', $className);
 
-        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Modules\Users";
+        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Modules\{$table}";
         if (method_exists($path, 'baseRules')) {
             $fields = $path::baseRules($fields);
         }
