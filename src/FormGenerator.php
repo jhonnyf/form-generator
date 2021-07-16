@@ -13,8 +13,8 @@ class FormGenerator
     private $action;
     private $autocomplete = "off";
     private $enctype;
-    private $method = 'POST';
-    private $class;
+    private $method   = 'POST';
+    private $class    = [];
     private $elements = [];
 
     public function __construct(string $action)
@@ -28,7 +28,7 @@ class FormGenerator
 
         $fields = $this->tableMetadata($tabel);
         $fields = $this->transformFields($fields);
-        $fields = $this->baseRules($tabel, $fields);        
+        $fields = $this->baseRules($tabel, $fields);
         $fields = $this->formatFields($fields, $values);
 
     }
@@ -38,7 +38,7 @@ class FormGenerator
         $Input = new Input;
         $Input->setName($name);
 
-        $this->elements[] = $Input;
+        $this->elements[$name] = $Input;
 
         return $Input;
     }
@@ -48,7 +48,7 @@ class FormGenerator
         $Select = new Select;
         $Select->setName($name);
 
-        $this->elements[] = $Select;
+        $this->elements[$name] = $Select;
 
         return $Select;
     }
@@ -58,7 +58,7 @@ class FormGenerator
         $Textarea = new Textarea;
         $Textarea->setName($name);
 
-        $this->elements[] = $Textarea;
+        $this->elements[$name] = $Textarea;
 
         return $Textarea;
     }
@@ -68,7 +68,7 @@ class FormGenerator
         $Button = new Button;
         $Button->setName($name);
 
-        $this->elements[] = $Button;
+        $this->elements[$name] = $Button;
 
         return $Button;
     }
@@ -137,6 +137,13 @@ class FormGenerator
         return view('form-generator::form-generator', $data);
     }
 
+    public function destroyElement(string $element): void
+    {
+        if (isset($this->elements[$element])) {
+            unset($this->elements[$element]);
+        }
+    }
+
     private function tableMetadata(string $table): array
     {
         return DB::select("DESCRIBE {$table};");
@@ -184,7 +191,7 @@ class FormGenerator
                 $value = $column['default'];
             }
 
-            $elementType = isset($column['elementType']) ? $column['elementType'] : 'input';
+            $_elementType = $elementType = isset($column['elementType']) ? $column['elementType'] : 'input';
             if ($elementType == 'input') {
 
                 if ($column['key'] === 'pri') {
@@ -204,15 +211,22 @@ class FormGenerator
             }
 
             $elementType = $this->$elementType($column['name'])
-                ->setType($type)
                 ->setValue($value);
 
-            if ($column['max_length'] > 0) {
-                $elementType->setMaxLength($column['max_length']);
+            if ($_elementType == 'input') {
+                $elementType->setType($type);
+
+                if (isset($column['max_length']) > 0 && $column['max_length'] > 0) {
+                    $elementType->setMaxLength($column['max_length']);
+                }
             }
 
             if (isset($column['required'])) {
                 $elementType->setRequired($column['required']);
+            }
+
+            if (isset($column['readonly'])) {
+                $elementType->setReadonly($column['readonly']);
             }
 
             if (isset($column['label'])) {
@@ -231,7 +245,9 @@ class FormGenerator
         $className = ucwords($className);
         $className = str_replace(' ', '', $className);
 
-        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Modules\{$table}";
+        $table = ucfirst($table);
+
+        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Modules\\" . $table;
         if (method_exists($path, 'baseRules')) {
             $fields = $path::baseRules($fields);
         }

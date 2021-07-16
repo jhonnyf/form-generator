@@ -1,11 +1,5 @@
-<form action="{{ $form['action'] }}" method="{{ $form['method'] }}" autocomplete="{{ $form['autocomplete'] }}">
+<form action="{{ $form['action'] }}" method="{{ $form['method'] }}" class="{{ implode(' ', $form['class']) }}" autocomplete="{{ $form['autocomplete'] }}">
     @csrf
-
-    {{-- <pre>
-        @php
-            print_r($elements);
-        @endphp
-    </pre> --}}
 
     <x-console-service-response-form />
 
@@ -16,7 +10,7 @@
             @else
                 <div class="mb-3">
                     <label for="{{ $element['name'] }}">{{ $element['label'] }}</label>
-                    <input type="{{ $element['type'] }}" name="{{ $element['name'] }}" id="{{ $element['name'] }}" class="form-control" {{ $element['required'] ? 'required' : '' }} value="{{ $element['value'] }}" maxlength="{{ $element['maxlength'] }}">
+                    <input type="{{ $element['type'] }}" name="{{ $element['name'] }}" id="{{ $element['name'] }}" class="form-control" {{ $element['required'] ? 'required' : '' }} {{ $element['readonly'] ? 'readonly' : '' }} value="{{ $element['value'] }}" maxlength="{{ $element['maxlength'] }}">
                 </div>
             @endif                    
         @endif
@@ -30,6 +24,13 @@
                         <option value="{{ $keyOption }}" {{ $keyOption == $element['value'] ? 'selected' : '' }}>{{ $option }}</option>
                     @endforeach
                 </select>
+            </div>
+        @endif
+
+        @if ($element['elementType'] == 'textarea')
+            <div class="mb-3">
+                <label for="{{ $element['name'] }}">{{ $element['label'] }}</label>
+                <textarea name="{{ $element['name'] }}" id="{{ $element['name'] }}" class="form-control">{{ $element['value'] }}</textarea>
             </div>
         @endif
 
