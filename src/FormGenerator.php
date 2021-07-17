@@ -137,6 +137,15 @@ class FormGenerator
         return view('form-generator::form-generator', $data);
     }
 
+    public function editElement(string $element)
+    {
+        if (isset($this->elements[$element])) {
+            return $this->elements[$element];
+        }
+
+        return false;
+    }
+
     public function destroyElement(string $element): void
     {
         if (isset($this->elements[$element])) {
@@ -221,6 +230,10 @@ class FormGenerator
                 }
             }
 
+            if ($_elementType == 'select') {
+                $elementType->setOptions($column['options']);
+            }
+
             if (isset($column['required'])) {
                 $elementType->setRequired($column['required']);
             }
@@ -245,9 +258,7 @@ class FormGenerator
         $className = ucwords($className);
         $className = str_replace(' ', '', $className);
 
-        $table = ucfirst($table);
-
-        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Modules\\" . $table;
+        $path = "\SenventhCode\ConsoleService\App\Services\Metadata\Modules\\" . $className;
         if (method_exists($path, 'baseRules')) {
             $fields = $path::baseRules($fields);
         }

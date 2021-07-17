@@ -6,7 +6,7 @@ class Select extends Element
 {
 
     private $multiple = false;
-    private $options;
+    private $options = [];
 
     /**
      * SETS
