@@ -1,5 +1,9 @@
 <form action="{{ $form['action'] }}" method="{{ $form['method'] }}" class="{{ implode(' ', $form['class']) }}" autocomplete="{{ $form['autocomplete'] }}">
     @csrf
+    
+    @if (isset($id) && is_null($id) === false)
+        @method('put')
+    @endif
 
     <x-console-service-response-form />
 

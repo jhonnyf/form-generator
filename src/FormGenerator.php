@@ -16,6 +16,7 @@ class FormGenerator
     private $method   = 'POST';
     private $class    = [];
     private $elements = [];
+    private $vars     = [];
 
     public function __construct(string $action)
     {
@@ -102,6 +103,11 @@ class FormGenerator
         $this->class = $class;
     }
 
+    public function setVars(string $name, $value): void
+    {
+        $this->vars[$name] = $value;
+    }
+
     /**
      * GET
      */
@@ -133,6 +139,12 @@ class FormGenerator
             'form'     => $formElements,
             'elements' => $this->getElements(),
         ];
+
+        if (count($this->vars) > 0) {
+            foreach ($this->vars as $key => $value) {
+                $data[$key] = $value;
+            }
+        }
 
         return view('form-generator::form-generator', $data);
     }
