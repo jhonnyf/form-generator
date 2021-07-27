@@ -257,6 +257,10 @@ class FormGenerator
             if (isset($column['label'])) {
                 $elementType->setLabel($column['label']);
             }
+
+            if (isset($column['class'])) {
+                $elementType->setClass($column['class']);
+            }            
         }
 
         $this->button('Salvar');

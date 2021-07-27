@@ -34,7 +34,7 @@
         @if ($element['elementType'] == 'textarea')
             <div class="mb-3">
                 <label for="{{ $element['name'] }}">{{ $element['label'] }}</label>
-                <textarea name="{{ $element['name'] }}" id="{{ $element['name'] }}" class="form-control">{{ $element['value'] }}</textarea>
+                <textarea name="{{ $element['name'] }}" id="{{ $element['name'] }}" class="form-control {{ count($element['classes']) > 0 ? implode('', $element['classes']) : ''}}">{{ $element['value'] }}</textarea>
             </div>
         @endif
 

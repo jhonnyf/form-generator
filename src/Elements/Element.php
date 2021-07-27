@@ -10,6 +10,7 @@ abstract class Element
     protected $value;
     protected $required = false;
     protected $disabled = false;
+    protected $classes = [];
 
     /**
      * SETS
@@ -47,6 +48,13 @@ abstract class Element
     public function setRequired(bool $required)
     {
         $this->required = $required;
+
+        return $this;
+    }
+
+    public function setClass(array $classes)
+    {
+        $this->classes = $classes;
 
         return $this;
     }
